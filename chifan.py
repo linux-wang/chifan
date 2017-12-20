@@ -15,7 +15,7 @@ def tweet(content):
     fanfou.bound(client)
     body = {'status': content}
     resp = client.statuses.update(body)
-    return resp.code
+    return resp
 
 
 @app.route('/')
