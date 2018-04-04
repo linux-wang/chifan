@@ -45,8 +45,8 @@ def get_public_timeline():
     resp = client.statuses.public_timeline()
     data = json.loads(resp.read())
 
-    import time
-    output_file = 'data/' + time.strftime('%Y%m%d') + '.txt'
+    from datetime import datetime, timedelta
+    output_file = 'data/' + (datetime.now() + timedelta(hours=8)).strftime("%Y%m%d") + '.txt'
     
     for fan in data:
         with open(output_file, 'a') as f:
