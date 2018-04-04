@@ -70,7 +70,7 @@ def get_user_num(dt):
 
     count_file = 'data/' + dt + '_count.txt'
     with open(count_file, 'a') as f:
-        f.write(str(len(user_set)) + ' ' + str(message_num))
+        f.write(str(len(user_set)) + '_' + str(message_num))
 
     return "COUNT OVER!"
 
