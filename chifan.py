@@ -28,6 +28,14 @@ def tweet(content):
     return resp
 
 
+def tweet_photo(photo_add, text):
+    client = get_client()
+    args = {'photo': photo_add, 'status': text}
+    body, headers = fanfou.pick_image(args)
+    resp = client.photos.upload(body, headers)
+    return resp
+
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
@@ -80,4 +88,4 @@ def get_user_num(dt):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=True, threaded=True)
