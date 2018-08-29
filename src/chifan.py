@@ -12,7 +12,6 @@ except:
     from config import key, secret, username, password
 
 
-
 def get_client():
     import fanfou
     consumer = {'key': key, 'secret': secret}
@@ -21,18 +20,58 @@ def get_client():
     return client
 
 
+def get_user_msg(user_id):
+    client = get_client()
+    resp = client.statuses.user_timeline({"id": user_id})
+    msg = resp.json()[:5]
+
+    file_name = '../data/msg_id_' + user_id + '.txt'
+    msg_ids = set()
+
+    import os
+    if not os.path.exists(file_name):
+        with open(file_name, 'a+') as f:
+            pass
+
+    with open(file_name, 'r') as f:
+        msg_ids = f.readlines()
+        msg_ids = [mid.replace('\n', '') for mid in msg_ids]
+
+    msg = msg[::-1]
+
+    for m in msg:
+        if '@' not in m['text']:
+            if m['id'] not in msg_ids:
+                if not m.has_key('photo'):
+                    tweet(str(m['text']))
+                else:
+                    tweet_photo(m['photo']['largeurl'], m['text'])
+
+                with open(file_name, 'a') as f:
+                    f.write(m['id'] + '\n')
+                import time; time.sleep(3)
+    return 'Maybe OK!'
+
+
 def tweet(content):
     client = get_client()
     body = {'status': content}
-    resp = client.statuses.update(body)
+    try:
+        resp = client.statuses.update(body)
+    except:
+        resp = '请勿发送重复信息'
     return resp
 
 
 def tweet_photo(photo_add, text):
     client = get_client()
     args = {'photo': photo_add, 'status': text}
-    body, headers = fanfou.pick_image(args)
-    resp = client.photos.upload(body, headers)
+    import fanfou
+    body, headers = fanfou.pack_image(args)
+    try:
+        resp = client.photos.upload(body, headers)
+    except:
+        resp = "出错了"
     return resp
 
 
@@ -66,6 +105,11 @@ def get_public_timeline():
 
     return "WRITE SUCESS!"
 
+
+@app.route('/fanfou/backup/<user_id>', methods=['GET'])
+def backup_user_msg(user_id):
+    get_user_msg(user_id)
+    return "Maybe OK!"
 
 @app.route('/fanfou/public_timeline/count/<dt>', methods=['GET'])
 def get_user_num(dt):
